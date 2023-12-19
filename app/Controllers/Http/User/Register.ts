@@ -1,15 +1,22 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import { StoreValidator } from 'App/Validators/Auth'
+import { StoreValidator } from 'App/Validators/User/Register'
 import { User } from 'App/Models'
-import faker from 'faker'
+import { faker } from '@faker-js/faker'
+
 export default class UserResgisterController {
-  public async store({request}: HttpContextContract) {
+  public async store({ request }: HttpContextContract) {
     const { email, redirectUrl } = await request.validate(StoreValidator)
-    const user = await User.create({email})
+    const user = await User.create({ email })
 
     await user.save()
 
-    user.related('keys').create({key: faker.})
+    const key = faker.string.uuid() + new Date().getTime()
+
+    user.related('keys').create({ key })
+
+    const link = `${redirectUrl.replace(/\/$/, '')}/${key}`
+
+    // envio do email
   }
 
   public async show({}: HttpContextContract) {}
