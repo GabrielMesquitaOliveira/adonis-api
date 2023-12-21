@@ -36,9 +36,10 @@ export default class UserResgisterController {
 
   public async show({ params }: HttpContextContract) {
     const userKey = await UserKey.findByOrFail('key', params.key)
-    const user = await userKey.related('user').query().firstOrFail()
 
-    return user
+    await userKey.load('user')
+
+    return userKey.user
   }
 
   public async update({ request, response }: HttpContextContract) {
